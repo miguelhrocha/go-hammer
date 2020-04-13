@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -10,28 +11,47 @@ import (
 type RequestConfig struct {
 	url     string
 	holdFor int
+	thread  int
+	wg      *sync.WaitGroup
 }
 
-func request(thread int, config RequestConfig) {
+func request(config RequestConfig) {
 	for i := 0; i < config.holdFor; i++ {
 		start := time.Now()
 		res, _ := http.Get(config.url)
 		end := time.Now()
+		diff := end.Sub(start)
 
-		fmt.Printf("Thread=%d Status=%s Latency=%d \n", thread, res.Status, end.Sub(start))
-		time.Sleep(999 * time.Millisecond)
+		fmt.Printf("Time=%s Thread=%d Status=%s Latency=%d \n",
+			start.UTC(),
+			config.thread,
+			res.Status,
+			diff.Milliseconds(),
+		)
+
+		// TODO: Is not a good idea to always wait 1 second
+		// to generate the next request. We need to add the
+		// time it took to do the last request.
+		time.Sleep(1000 * time.Millisecond)
 	}
+
+	config.wg.Done()
 }
 
 func main() {
-	const tps = 2
-	config := RequestConfig{}
-	config.url = "https://google.com"
-	config.holdFor = 10
+	const tps = 100
+
+	var wg sync.WaitGroup
+	wg.Add(tps)
 
 	for i := 0; i < tps; i++ {
-		go request(i, config)
+		config := RequestConfig{}
+		config.url = "https://google.com"
+		config.holdFor = 10
+		config.thread = i
+		config.wg = &wg
+		go request(config)
 	}
 
-	time.Sleep(12 * time.Second)
+	wg.Wait()
 }
