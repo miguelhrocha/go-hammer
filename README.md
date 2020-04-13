@@ -4,7 +4,7 @@ A load generator in Go.
 
 ## Why Go? 
 
-A load generator has the ability to generate concurrent requests against a defined target. One of the nicest features in Go is actually Concurrency; It's easy to program and also very resource efficient.  Concurrency in Go is done via [goroutines](https://golang.org/doc/faq#goroutines) and [Channels](https://golangbot.com/channels/). Goroutines are basically functions that run concurrently with other functions, kind of like threads, however, they are not implemented as such. Goroutines are multiplexed to a limited number of OS threads and is one of the reasons why concurrency in Go is efficient. Channels are like message buses where Goroutines can communicate to each other in a race-condition-safe manner.
+A load generator has the ability to generate _concurrent_ requests against a defined target, and one of the nicest features in Go is actually Concurrency –– It is easy to program and also very resource efficient. [Goroutines](https://golang.org/doc/faq#goroutines) and [Channels](https://golangbot.com/channels/) are the main characters involved in it. Goroutines are basically functions that run concurrently with other functions, not to be confused with threads, goroutines are multiplexed to a limited number of OS threads and is one of the reasons why concurrency in Go is efficient. Channels, on the other hand, are like message pipes where Goroutines can communicate to each other in a race-condition-safe manner.
 
 ## TPS
 
