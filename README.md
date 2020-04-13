@@ -10,9 +10,9 @@ A load generator has the ability to generate _concurrent_ requests against a def
 
 I am considering 2 approaches for generating concurrent requests with Goroutines: 
 
-Option 1) **Long living goroutines**. Create as many routines as TPS specified, where each is in charge of triggering a request every second. The challenge with this approach is that the routine waits for the request to resolve, and if the request takes longer than a second, we will not meet the desired TPS. 
+**Long living goroutines**. Create as many routines as TPS specified, where each is in charge of triggering a request every second. The challenge with this approach is that the routine waits for the request to resolve, and if the request takes longer than a second, we will not meet the desired TPS. 
 
-Option 2) **Goroutine per request**. Create a goroutine per request, where every second we spawn as many routines as TPS specified. These routines will be short-lived as they will die as soon as the request is over. Potential downside: Is it too much overhead to create many goroutines every second? 
+**Goroutine per request**. Create a goroutine per request, where every second we spawn as many routines as TPS specified. These routines will be short-lived as they will die as soon as the request is over. Potential downside: Is it too much overhead to create many goroutines every second? 
 
 ## Profiling
 
