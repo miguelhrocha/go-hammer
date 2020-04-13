@@ -14,6 +14,10 @@ I am considering 2 approaches for generating concurrent requests with Goroutines
 
 **Goroutine per request**. Create a goroutine per request, where every second we spawn as many routines as TPS specified. These routines will be short-lived as they will die as soon as the request is over. Potential downside: Is it too much overhead to create many goroutines every second? 
 
+## Reporting
+
+TODO: Implement generation of reports that show a summary of requests but also captures raw data. Important that we show percentiles. I am thinking that each goroutine reports back its data using Channels to a metrics-dedicated routine. 
+
 ## Profiling
 
 ```
