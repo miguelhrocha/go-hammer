@@ -1,6 +1,6 @@
-![Build](https://github.com/ferdingler/go-hammer/workflows/Build/badge.svg)
-
 # go-hammer
+
+![Build](https://github.com/ferdingler/go-hammer/workflows/Build/badge.svg)
 
 A (work in progress) load generator in Go.
 

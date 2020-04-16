@@ -103,7 +103,6 @@ func run(tps int, holdFor int, url string) {
 func main() {
 	const tps = 240
 	const holdFor = 10
-	// const url = "https://dev.api.awsdingler.com/v1/hello"
 	const url = "https://www.google.com"
 	run(tps, holdFor, url)
 }
