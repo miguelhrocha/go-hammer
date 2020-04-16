@@ -1,4 +1,4 @@
-![Build](https://github.com/ferdingler/go-hammer/workflows/Go/badge.svg)
+![Build](https://github.com/ferdingler/go-hammer/workflows/Build/badge.svg)
 
 # go-hammer
 

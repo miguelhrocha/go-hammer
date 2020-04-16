@@ -32,6 +32,7 @@ func TestLoadGeneration(t *testing.T) {
 
 	// Start listening for requests
 	go http.ListenAndServe(":3000", nil)
+	time.Sleep(2 * time.Second)
 
 	// Start load test
 	go run(tps, holdFor, url)
