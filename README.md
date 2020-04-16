@@ -8,7 +8,7 @@ A (work in progress) load generator in Go.
 
 A load generator has the ability to generate _concurrent_ requests against a defined target, and one of the nicest features in Go is actually [Concurrency](https://www.youtube.com/watch?v=cN_DpYBzKso) –– It is easy to program and also very resource efficient. [Goroutines](https://golang.org/doc/faq#goroutines) and [Channels](https://golangbot.com/channels/) are the main characters involved in it. Goroutines are basically functions that run concurrently with other functions; Not to be confused with threads, goroutines are actually multiplexed to a limited number of OS threads and is one of the reasons why concurrency in Go is efficient. Channels are message pipes where Goroutines can communicate to each other in a race-condition-safe manner.
 
-## TPS Generation
+## TPS Generator
 
 I am considering two approaches for generating concurrent requests with Goroutines: 
 
@@ -37,6 +37,15 @@ ulimit -n
 
 Need to test on an EC2 and within a Fargate container and compare.
 
+## Testing
+
+Functional testing is done by spinning up a local web server and then pointing the load generator against it. The local web server verifies that the expected number of requests generated are actually received.
+
+```
+go test -v
+```
+
 ## Other thoughts
 
-**Distribute requests evenly within the timeframe of a second?**. The current implementation triggers all requests in the beginning of a second, obviously each consecutive request is triggered slightly (a few microseconds?) after the previous one, but this means that all the remaining time before the second is over is empty and quiet with no requests. I suspect that distributing all of these requests evenly within the timeframe of a second would mimic real-world  traffic more realistically and would create less pressure on the system under test. Although maybe the inherent variability in the latency of the internet and networks already accomplishes this? Not sure.
+**Distribute requests evenly within the timeframe of a second?**  
+The current implementation triggers all requests in the beginning of a second, obviously each consecutive request is triggered slightly (a few microseconds?) after the previous one, but this means that all the remaining time before the second is over is empty and quiet with no requests. I suspect that distributing all of these requests evenly within the timeframe of a second would mimic real-world traffic more realistically and will create less pressure on the system under test.

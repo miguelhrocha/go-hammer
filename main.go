@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -39,9 +40,35 @@ func request(url string, ch chan Response, wg *sync.WaitGroup, client *http.Clie
 	wg.Done()
 }
 
+func createResultsDir() {
+	const dir = "results"
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if os.Mkdir(dir, 0755) != nil {
+			panic("failed to create results directory")
+		}
+	}
+}
+
+func createResultsFile() *os.File {
+	os.Chdir("results")
+	name := time.Now().Format(time.UnixDate)
+	f, err := os.Create(name + ".csv")
+	if err != nil {
+		panic("failed to create results file")
+	}
+	return f
+}
+
 func capture(ch chan Response) {
+	createResultsDir()
+	out := createResultsFile()
+
+	// CSV header
+	fmt.Fprintf(out, "Timestamp,Status,Latency\n")
+
+	// Listen for messages in channel and write results
 	for message := range ch {
-		fmt.Printf("Time=%s Status=%d Latency=%d \n",
+		fmt.Fprintf(out, "%s,%d,%d\n",
 			message.timestamp,
 			message.httpStatus,
 			message.latency,
