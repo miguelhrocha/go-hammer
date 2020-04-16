@@ -49,11 +49,7 @@ func capture(ch chan Response) {
 	}
 }
 
-func main() {
-	const tps = 240
-	const holdFor = 10
-	// const url = "https://dev.api.awsdingler.com/v1/hello"
-	const url = "https://www.google.com"
+func run(tps int, holdFor int, url string) {
 	total := 0
 
 	ch := make(chan Response)
@@ -75,4 +71,12 @@ func main() {
 
 	wg.Wait()
 	fmt.Printf("Total requests=%d \n", total)
+}
+
+func main() {
+	const tps = 240
+	const holdFor = 10
+	// const url = "https://dev.api.awsdingler.com/v1/hello"
+	const url = "https://www.google.com"
+	run(tps, holdFor, url)
 }
