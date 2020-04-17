@@ -10,11 +10,19 @@ A load generator has the ability to generate _concurrent_ requests against a def
 
 ## TPS Generator
 
-I am considering two approaches for generating concurrent requests with Goroutines: 
+**Goroutine per request**
+There are as many goroutines as TPS specified spawned every second. I'm calling them Hammers, they are short-lived because they die as soon as their request is over, and they can be of different types to extend the system. For example a hammer of type HTTP knows how to trigger HTTP requests, but a hammer of type IoT knows how to generate MQQT requests. This allows for the actual testing logic to be decoupled from the load generation orchestration. The following diagram illustrates the goroutines involved, which are represented by circles:
 
-**Long living goroutines**. Create as many routines as TPS specified, where each is in charge of generating a request every second. The challenge with this approach is that the goroutine waits for the request to resolve and if it takes longer than a second, it will not meet the desired TPS.
+![Goroutines](docs/goroutines.png)
 
-**Goroutine per request**. Create a goroutine per request where every second, there will be as many goroutines as TPS specified spawned. These routines will be short-lived as they will die as soon as the request resolves. Potential downside: Will it be too much overhead to create hundreds/thousands of goroutines every second? What if the requests are timing out and the _running active_ goroutines start to pile up?
+My initial concern with this approach was the high number of goroutines created every second, but this seems to be less of a concern as goroutines are very efficient and lightweight. However I'm still worried about a situation where the endpoint under test is slow to respond, causing the Hammers to take longer to complete and the _running active_ count of Hammers will start to pile up. 
+
+**TODO:** Find out if the aggregator goroutine will become a bottleneck? When the Hammers write to the _responses channel_ they block until the _aggregator_ reads; This is the nature of how channels work because they are also a synchronization mechanism, however, this may cause the _aggregator_ to become a bottleneck as it will block the Hammers until it catches up draining the channel.
+
+### Other approaches considered
+
+**Long living goroutines**  
+Create as many goroutines as TPS specified where each goroutine is in charge of generating a request (i.e. HTTP) every second. The challenge is that the goroutine waits for the request to resolve and if it takes longer than a second, the system as whole will not meet the desired TPS.
 
 ## Reporting
 
