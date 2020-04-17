@@ -7,20 +7,25 @@ import (
 	"time"
 )
 
-func TestLoadGeneration(t *testing.T) {
+func TestLoadGen(t *testing.T) {
 
-	// Test params
-	const tps = 1
-	const holdFor = 10
-	const url = "http://127.0.0.1:3000/foo"
+	// Test Scenario
+	scenario := Scenario{}
+	scenario.endpoint = "http://127.0.0.1:3000/foo"
+	scenario.hammer = "HTTP"
+
+	// Execution values
+	config := RunConfig{}
+	config.tps = 1
+	config.duration = 10
 
 	// Expected values
-	totalExpected := tps * holdFor
 	requests := 0
+	totalExpected := config.tps * config.duration
 
 	// Prepare web server
 	done := make(chan bool)
-	timeout := time.After((holdFor * 2) * time.Second)
+	timeout := time.After(20 * time.Second)
 	http.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
 		requests++
 		if requests == totalExpected {
@@ -35,7 +40,7 @@ func TestLoadGeneration(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Start load test
-	go run(tps, holdFor, url)
+	go run(config, scenario)
 
 	select {
 	case <-done:

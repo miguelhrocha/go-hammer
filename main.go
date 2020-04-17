@@ -2,107 +2,56 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"os"
-	"sync"
-	"time"
 )
 
-// Response is information about http response
-type Response struct {
-	latency    int64 // milliseconds
-	httpStatus int
-	timestamp  time.Time
-}
-
-func request(url string, ch chan Response, wg *sync.WaitGroup, client *http.Client) {
-	start := time.Now()
-	res, err := client.Get(url)
-	end := time.Now()
-	diff := end.Sub(start)
-
-	if err != nil {
-		// non-2xx response doesn't cause an error.
-		panic(err)
-	}
-
-	// close response body
-	defer res.Body.Close()
-
-	// Communicate back the response details
-	response := Response{}
-	response.latency = diff.Milliseconds()
-	response.timestamp = start.UTC()
-	response.httpStatus = res.StatusCode
-	ch <- response
-
-	// Notify completion to wait group
-	wg.Done()
-}
-
-func createResultsDir() {
-	const dir = "results"
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		if os.Mkdir(dir, 0755) != nil {
-			panic("failed to create results directory")
-		}
-	}
-}
-
-func createResultsFile() *os.File {
-	os.Chdir("results")
-	name := time.Now().Format(time.UnixDate)
-	f, err := os.Create(name + ".csv")
-	if err != nil {
-		panic("failed to create results file")
-	}
-	return f
-}
-
-func capture(ch chan Response) {
-	createResultsDir()
-	out := createResultsFile()
+func aggregate(ch chan HammerResponse) {
+	// createResultsDir()
+	// out := createResultsFile()
 
 	// CSV header
-	fmt.Fprintf(out, "Timestamp,Status,Latency\n")
+	// fmt.Fprintf(out, "Timestamp,Status,Latency\n")
+
+	// Keep results in-memory
+	var latencies []int64
 
 	// Listen for messages in channel and write results
 	for message := range ch {
-		fmt.Fprintf(out, "%s,%d,%d\n",
+		latencies = append(latencies, message.latency)
+		// fmt.Fprintf(out, "%s,%d,%d\n",
+		// 	message.timestamp,
+		// 	message.status,
+		// 	message.latency,
+		// )
+		fmt.Printf("%s,%d,%d\n",
 			message.timestamp,
-			message.httpStatus,
+			message.status,
 			message.latency,
 		)
 	}
 }
 
-func run(tps int, holdFor int, url string) {
-	total := 0
+func run(config RunConfig, scenario Scenario) {
+	out := make(chan HammerResponse)
+	done := make(chan bool)
 
-	ch := make(chan Response)
-	var wg sync.WaitGroup
-	go capture(ch)
+	go loadgen(config, scenario, out, done)
+	go aggregate(out)
 
-	client := http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	for i := 0; i < holdFor; i++ {
-		wg.Add(tps)
-		for j := 0; j < tps; j++ {
-			total = total + 1
-			go request(url, ch, &wg, &client)
-		}
-		time.Sleep(1000 * time.Millisecond)
-	}
-
-	wg.Wait()
-	fmt.Printf("Total requests=%d \n", total)
+	<-done
+	fmt.Println("Good bye")
 }
 
 func main() {
-	const tps = 240
-	const holdFor = 10
-	const url = "https://www.google.com"
-	run(tps, holdFor, url)
+
+	/// Default scenario
+	scenario := Scenario{}
+	scenario.endpoint = "https://www.google.com"
+	scenario.hammer = "HTTP"
+
+	// Default execution values
+	config := RunConfig{}
+	config.tps = 1
+	config.duration = 10
+
+	run(config, scenario)
 }
