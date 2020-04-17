@@ -10,7 +10,7 @@ A load generator has the ability to generate _concurrent_ requests against a def
 
 ## TPS Generator
 
-**Goroutine per request**
+**Goroutine per request**  
 There are as many goroutines as TPS specified spawned every second. I'm calling them Hammers, they are short-lived because they die as soon as their request is over, and they can be of different types to extend the system. For example a hammer of type HTTP knows how to trigger HTTP requests, but a hammer of type IoT knows how to generate MQQT requests. This allows for the actual testing logic to be decoupled from the load generation orchestration. The following diagram illustrates the goroutines involved, which are represented by circles:
 
 ![Goroutines](docs/goroutines.png)
