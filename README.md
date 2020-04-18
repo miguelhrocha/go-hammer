@@ -2,7 +2,7 @@
 
 ![Build](https://github.com/ferdingler/go-hammer/workflows/Build/badge.svg)
 
-A (work in progress) load generator in Go.
+A load generator written in Go.
 
 ## Why Go?
 
@@ -23,6 +23,10 @@ My initial concern with this approach was the high number of goroutines created 
 
 **Long living goroutines**  
 Create as many goroutines as TPS specified where each goroutine is in charge of generating a request (i.e. HTTP) every second. The challenge is that the goroutine waits for the request to resolve and if it takes longer than a second, the system as whole will not meet the desired TPS.
+
+## Custom hammers
+
+The extensibility of the program comes by writing custom _hammers_. At the moment, the only one written is hardcoded to generate an HTTP GET request against the given endpoint, but the intention is to make a _hammer_ interface that any other package can implement and customize the logic within it. This package will handle the orchestration and load generation, and the custom _hammers_ will implement the logic to test the given endpoint. This package can also evolve to provide useful tools to the _hammers_ to make their implementation easier, for example, a random data generator or a user credentials provider. 
 
 ## Run tests
 
