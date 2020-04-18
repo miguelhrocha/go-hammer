@@ -16,7 +16,7 @@ func TestLoadGen(t *testing.T) {
 
 	// Execution values
 	config := RunConfig{}
-	config.tps = 1
+	config.tps = 2
 	config.duration = 10
 
 	// Expected values

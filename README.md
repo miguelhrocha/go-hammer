@@ -11,7 +11,7 @@ A load generator has the ability to generate _concurrent_ requests against a def
 ## TPS Generator
 
 **Goroutine per request**  
-There are as many goroutines as TPS specified spawned every second. I'm calling them Hammers, they are short-lived because they die as soon as their request is over, and they can be of different types to extend the system. For example a hammer of type HTTP knows how to trigger HTTP requests, but a hammer of type IoT knows how to generate MQTT requests. This allows for the actual testing logic to be decoupled from the load generation orchestration. The following diagram illustrates the goroutines involved, which are represented by circles:
+There are as many goroutines as TPS specified spawned every second. I'm calling them Hammers and they are short-lived because they die as soon as their request is over. There can be hammers of different types, for example, a hammer of type HTTP knows how to trigger HTTP requests, but a hammer of type IoT knows how to generate MQTT requests. This allows for extensibility and to decouple the actual testing logic from the load generation orchestration. The following diagram illustrates the goroutines involved, which are represented by circles:
 
 ![Goroutines](docs/goroutines.png)
 
@@ -43,7 +43,7 @@ The max TPS seems to be constrained by the host OS max open files limit. The pac
 ulimit -n
 ```
 
-Need to test on an EC2 and within a Fargate container and compare.
+I have tested on an EC2 instance t2.micro with Amazon Linux 2 and was able to go to 500 TPS. Still need to test within a docker container running on Fargate.
 
 ## Testing
 

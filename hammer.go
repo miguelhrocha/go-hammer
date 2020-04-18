@@ -8,7 +8,7 @@ import (
 
 // Response is information about http response
 type HammerResponse struct {
-	latency   int64 // milliseconds
+	latency   int // milliseconds
 	status    int
 	timestamp time.Time
 	failed    bool
@@ -52,7 +52,7 @@ func httpHammer(scenario Scenario) HammerResponse {
 	// close response body
 	defer res.Body.Close()
 	return HammerResponse{
-		latency:   diff.Milliseconds(),
+		latency:   int(diff.Milliseconds()),
 		status:    res.StatusCode,
 		timestamp: start.UTC(),
 	}

@@ -1,44 +1,15 @@
 package main
 
-import (
-	"fmt"
-)
-
-func aggregate(ch chan HammerResponse) {
-	// createResultsDir()
-	// out := createResultsFile()
-
-	// CSV header
-	// fmt.Fprintf(out, "Timestamp,Status,Latency\n")
-
-	// Keep results in-memory
-	var latencies []int64
-
-	// Listen for messages in channel and write results
-	for message := range ch {
-		latencies = append(latencies, message.latency)
-		// fmt.Fprintf(out, "%s,%d,%d\n",
-		// 	message.timestamp,
-		// 	message.status,
-		// 	message.latency,
-		// )
-		fmt.Printf("%s,%d,%d\n",
-			message.timestamp,
-			message.status,
-			message.latency,
-		)
-	}
-}
-
 func run(config RunConfig, scenario Scenario) {
-	out := make(chan HammerResponse)
-	done := make(chan bool)
+	stop := make(chan bool)
+	done, responses := loadgen(config, scenario)
+	s := aggregate(responses, stop)
 
-	go loadgen(config, scenario, out, done)
-	go aggregate(out)
+	<-done         // wait until loadgen finishes
+	stop <- true   // tell aggregator to stop
+	summary := <-s // read summary from aggregator
 
-	<-done
-	fmt.Println("Good bye")
+	outSummary(summary)
 }
 
 func main() {
@@ -50,8 +21,8 @@ func main() {
 
 	// Default execution values
 	config := RunConfig{}
-	config.tps = 1
-	config.duration = 10
+	config.tps = 3
+	config.duration = 60
 
 	run(config, scenario)
 }
