@@ -1,4 +1,4 @@
-package main
+package gohammer
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func aggregate(responses chan HammerResponse, stop chan bool) chan Summary {
 			// Continue reading from responses until signaled
 			// to stop by the channel.
 			case response := <-responses:
-				latencies = append(latencies, response.latency)
+				latencies = append(latencies, response.Latency)
 				outResponse(response)
 			// Signal to stop by the main routine,
 			// compute summary and report it back

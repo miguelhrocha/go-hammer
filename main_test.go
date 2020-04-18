@@ -1,4 +1,4 @@
-package main
+package gohammer
 
 import (
 	"fmt"
@@ -9,19 +9,18 @@ import (
 
 func TestLoadGen(t *testing.T) {
 
-	// Test Scenario
-	scenario := Scenario{}
-	scenario.endpoint = "http://127.0.0.1:3000/foo"
-	scenario.hammer = "HTTP"
-
 	// Execution values
 	config := RunConfig{}
-	config.tps = 2
-	config.duration = 10
+	config.TPS = 2
+	config.Duration = 10
+
+	hammer := HTTPHammer{}
+	hammer.Endpoint = "http://127.0.0.1:3000/foo"
+	hammer.Method = "GET"
 
 	// Expected values
 	requests := 0
-	totalExpected := config.tps * config.duration
+	totalExpected := config.TPS * config.Duration
 
 	// Prepare web server
 	done := make(chan bool)
@@ -40,7 +39,7 @@ func TestLoadGen(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Start load test
-	go run(config, scenario)
+	go Run(config, hammer)
 
 	select {
 	case <-done:

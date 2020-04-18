@@ -1,4 +1,4 @@
-package main
+package gohammer
 
 import (
 	"fmt"
@@ -13,9 +13,9 @@ func outResponse(response HammerResponse) {
 	// 	response.latency,
 	// )
 	fmt.Printf("%s,%d,%d\n",
-		response.timestamp,
-		response.status,
-		response.latency,
+		response.Timestamp,
+		response.Status,
+		response.Latency,
 	)
 }
 

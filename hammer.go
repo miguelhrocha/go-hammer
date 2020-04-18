@@ -1,4 +1,4 @@
-package main
+package gohammer
 
 import (
 	"net/http"
@@ -6,27 +6,42 @@ import (
 	"time"
 )
 
-// Response is information about http response
-type HammerResponse struct {
-	latency   int // milliseconds
-	status    int
-	timestamp time.Time
-	failed    bool
+// Hammer defines functions to be implemented by hammers
+type Hammer interface {
+	Hit() HammerResponse
 }
 
-// Shim that decides what hammer to use
-func hammer(scenario Scenario, out chan HammerResponse, wg *sync.WaitGroup) {
-	if scenario.hammer == "HTTP" {
-		response := httpHammer(scenario)
-		out <- response
-		wg.Done()
-	}
+// HammerResponse is information about a hammer response
+type HammerResponse struct {
+	Latency   int // milliseconds
+	Status    int
+	Timestamp time.Time
+	Failed    bool
+}
+
+func useHammer(h Hammer, out chan HammerResponse, wg *sync.WaitGroup) {
+	response := h.Hit()
+	out <- response
+	wg.Done()
+}
+
+// Built-in Hammers
+//
+// The following are definitions and implementations of the
+// built-in hammers this library offers. Anyone can develop
+// their own custom hammers but for quick usage, they can use
+// the built-in ones provided below.
+
+// HTTPHammer built-in for http requests
+type HTTPHammer struct {
+	Endpoint string
+	Method   string
 }
 
 var client *http.Client
 
-// Hammer of type HTTP
-func httpHammer(scenario Scenario) HammerResponse {
+// Hit method for HTTPHammer
+func (h HTTPHammer) Hit() HammerResponse {
 	if client == nil {
 		client = new(http.Client)
 		client.Timeout = time.Second * 10
@@ -34,7 +49,7 @@ func httpHammer(scenario Scenario) HammerResponse {
 
 	// Trigger HTTP request and time it
 	start := time.Now()
-	res, err := client.Get(scenario.endpoint)
+	res, err := client.Get(h.Endpoint)
 	end := time.Now()
 	diff := end.Sub(start)
 
@@ -42,18 +57,18 @@ func httpHammer(scenario Scenario) HammerResponse {
 		// non-2xx response doesn't cause an error,
 		// so this error means something bad happened.
 		return HammerResponse{
-			latency:   0,
-			status:    0,
-			timestamp: start.UTC(),
-			failed:    true,
+			Latency:   0,
+			Status:    0,
+			Timestamp: start.UTC(),
+			Failed:    true,
 		}
 	}
 
 	// close response body
 	defer res.Body.Close()
 	return HammerResponse{
-		latency:   int(diff.Milliseconds()),
-		status:    res.StatusCode,
-		timestamp: start.UTC(),
+		Latency:   int(diff.Milliseconds()),
+		Status:    res.StatusCode,
+		Timestamp: start.UTC(),
 	}
 }
