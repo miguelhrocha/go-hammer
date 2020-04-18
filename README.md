@@ -24,9 +24,13 @@ My initial concern with this approach was the high number of goroutines created 
 **Long living goroutines**  
 Create as many goroutines as TPS specified where each goroutine is in charge of generating a request (i.e. HTTP) every second. The challenge is that the goroutine waits for the request to resolve and if it takes longer than a second, the system as whole will not meet the desired TPS.
 
-## Reporting
+## Run tests
 
-The approach for reporting results would be for each goroutine to send results of the requests to a shared Channel. There is a separate goroutine in charge of listening for these results and keeping a running count and do a summary at the end. Challenge? How does this goroutine know that all requests have finished and when should it start to calculate the final results?
+Functional testing is done by spinning up a local web server and then pointing the load generator against it. The local web server verifies that the expected number of requests generated are actually received.
+
+```
+go test -v
+```
 
 ## Profiling
 
@@ -44,14 +48,6 @@ ulimit -n
 ```
 
 I have tested on an EC2 instance t2.micro with Amazon Linux 2 and was able to go to 500 TPS. Still need to test within a docker container running on Fargate.
-
-## Testing
-
-Functional testing is done by spinning up a local web server and then pointing the load generator against it. The local web server verifies that the expected number of requests generated are actually received.
-
-```
-go test -v
-```
 
 ## Other thoughts
 
