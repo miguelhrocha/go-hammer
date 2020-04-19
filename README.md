@@ -8,7 +8,7 @@ A load generator library written in Go.
 
 The following example uses the built-in HTTPHammer that generates HTTP requests against a given endpoint.
 
-```
+```go
 import (
 	gohammer "github.com/ferdingler/go-hammer"
 )
@@ -53,7 +53,7 @@ Create as many goroutines as TPS specified where each goroutine is in charge of 
 
 This library will have a number of built-in generic hammers that users can leverage to get started very quickly, like the HTTPHammer. But the real power and extensibility of the library comes by writting custom _hammers_ that implement the Hammer interface and have custom logic that runs on every request.
 
-```
+```go
 type Hammer interface {
 	Hit() HammerResponse
 }
