@@ -19,7 +19,7 @@ func outResponse(response HammerResponse) {
 	)
 }
 
-func outSummary(summary Summary) {
+func outSummary(summary runSummary) {
 	fmt.Println("--")
 	fmt.Println("Summary")
 	fmt.Println("--")

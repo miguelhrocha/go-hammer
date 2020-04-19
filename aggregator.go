@@ -5,15 +5,16 @@ import (
 	"sort"
 )
 
-type Summary struct {
+// runSummary represents summarized stats for a Run
+type runSummary struct {
 	p99 int
 	p95 int
 	p90 int
 	p50 int
 }
 
-func aggregate(responses chan HammerResponse, stop chan bool) chan Summary {
-	summary := make(chan Summary)
+func aggregate(responses chan HammerResponse, stop chan bool) chan runSummary {
+	summary := make(chan runSummary)
 	go func() {
 		// Holds values in-memory
 		var latencies []int
@@ -35,9 +36,9 @@ func aggregate(responses chan HammerResponse, stop chan bool) chan Summary {
 	return summary
 }
 
-func summarize(latencies []int) Summary {
+func summarize(latencies []int) runSummary {
 	sort.Ints(latencies)
-	return Summary{
+	return runSummary{
 		p99: percentile(latencies, 99),
 		p95: percentile(latencies, 95),
 		p90: percentile(latencies, 90),
