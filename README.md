@@ -2,7 +2,30 @@
 
 ![Build](https://github.com/ferdingler/go-hammer/workflows/Build/badge.svg)
 
-A load generator written in Go.
+A load generator library written in Go.
+
+## Usage
+
+The following example uses the built-in HTTPHammer that generates HTTP requests against a given endpoint. More examples will be added in the _examples_ folder that show how to use custom hammers.
+
+```
+import (
+	gohammer "github.com/ferdingler/go-hammer"
+)
+
+func main() {
+	config := gohammer.RunConfig{
+		TPS:      10,
+		Duration: 60,
+	}
+
+	hammer := gohammer.HTTPHammer{}
+	hammer.Endpoint = "https://www.google.com"
+	hammer.Method = "GET"
+
+	gohammer.Run(config, hammer)
+}
+```
 
 ## Why Go?
 
@@ -26,7 +49,15 @@ Create as many goroutines as TPS specified where each goroutine is in charge of 
 
 ## Custom hammers
 
-The extensibility of the program comes by writing custom _hammers_. At the moment, the only one written is hardcoded to generate an HTTP GET request against the given endpoint, but the intention is to make a _hammer_ interface that any other package can implement and customize the logic within it. This package will handle the orchestration and load generation, and the custom _hammers_ will implement the logic to test the given endpoint. This package can also evolve to provide useful tools to the _hammers_ to make their implementation easier, for example, a random data generator or a user credentials provider. 
+This library will have a number of built-in generic hammers that users can leverage to get started very quickly, like the HTTPHammer. But the real power and extensibility of the library comes by writting custom _hammers_ that implement the Hammer interface and have custom logic that runs on every request.
+
+```
+type Hammer interface {
+	Hit() HammerResponse
+}
+```
+
+This library can also evolve to provide useful tools to the _hammers_ to make their implementation easier, for example, a random data generator or a user credentials provider. 
 
 ## Run tests
 
