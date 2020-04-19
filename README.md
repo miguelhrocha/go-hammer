@@ -6,7 +6,7 @@ A load generator library written in Go.
 
 ## Usage
 
-The following example uses the built-in HTTPHammer that generates HTTP requests against a given endpoint. More examples will be added in the _examples_ folder that show how to use custom hammers.
+The following example uses the built-in HTTPHammer that generates HTTP requests against a given endpoint.
 
 ```
 import (
@@ -26,6 +26,8 @@ func main() {
 	gohammer.Run(config, hammer)
 }
 ```
+
+More examples of using other built-in or custom hammers will be added in the _examples_ folder.
 
 ## Why Go?
 
