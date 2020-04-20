@@ -35,19 +35,18 @@ func useHammer(h Hammer, out chan HammerResponse, wg *sync.WaitGroup) {
 
 // HTTPHammer built-in for http requests
 type HTTPHammer struct {
+	client      *http.Client
 	Endpoint    string
 	Method      string
 	ContentType string
 	Body        []byte
 }
 
-var client *http.Client
-
 // Hit method for HTTPHammer
 func (h HTTPHammer) Hit() HammerResponse {
-	if client == nil {
-		client = new(http.Client)
-		client.Timeout = time.Second * 10
+	if h.client == nil {
+		h.client = new(http.Client)
+		h.client.Timeout = time.Second * 10
 	}
 
 	// Trigger HTTP request and time it
@@ -87,5 +86,5 @@ func httpRequest(h HTTPHammer) (*http.Response, error) {
 		req.Header.Add("Content-Type", h.ContentType)
 	}
 
-	return client.Do(req)
+	return h.client.Do(req)
 }
