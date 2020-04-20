@@ -7,11 +7,6 @@ import (
 )
 
 func outResponse(response HammerResponse) {
-	// fmt.Fprintf(out, "%s,%d,%d\n",
-	// 	response.timestamp,
-	// 	response.status,
-	// 	response.latency,
-	// )
 	fmt.Printf("%s,%d,%d\n",
 		response.Timestamp,
 		response.Status,

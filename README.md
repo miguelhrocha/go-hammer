@@ -25,6 +25,18 @@ func main() {
 }
 ```
 
+## Custom hammers
+
+This library will have a number of built-in generic hammers that users can leverage to get started very quickly, like the HTTPHammer. But the real power and extensibility of the library comes by writting custom _hammers_ that implement the Hammer interface and have custom logic that runs on every request.
+
+```go
+type Hammer interface {
+	Hit() HammerResponse
+}
+```
+
+This library can also evolve to provide useful tools to the _hammers_ to make their implementation easier, for example, a random data generator or a user credentials provider. 
+
 ## Why Go?
 
 A load generator has the ability to generate _concurrent_ requests against a defined target, and one of the nicest features in Go is actually [Concurrency](https://www.youtube.com/watch?v=cN_DpYBzKso) –– It is easy to program and also very resource efficient. [Goroutines](https://golang.org/doc/faq#goroutines) and [Channels](https://golangbot.com/channels/) are the main characters involved in it. Goroutines are basically functions that run concurrently with other functions; Not to be confused with threads, goroutines are actually multiplexed to a limited number of OS threads and is one of the reasons why concurrency in Go is efficient. Channels are message pipes where Goroutines can communicate to each other in a race-condition-safe manner.
@@ -44,18 +56,6 @@ My initial concern with this approach was the high number of goroutines created 
 
 **Long living goroutines**  
 Create as many goroutines as TPS specified where each goroutine is in charge of generating a request (i.e. HTTP) every second. The challenge is that the goroutine waits for the request to resolve and if it takes longer than a second, the system as whole will not meet the desired TPS.
-
-## Custom hammers
-
-This library will have a number of built-in generic hammers that users can leverage to get started very quickly, like the HTTPHammer. But the real power and extensibility of the library comes by writting custom _hammers_ that implement the Hammer interface and have custom logic that runs on every request.
-
-```go
-type Hammer interface {
-	Hit() HammerResponse
-}
-```
-
-This library can also evolve to provide useful tools to the _hammers_ to make their implementation easier, for example, a random data generator or a user credentials provider. 
 
 ## Run tests
 

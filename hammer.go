@@ -1,6 +1,7 @@
 package gohammer
 
 import (
+	"bytes"
 	"net/http"
 	"sync"
 	"time"
@@ -34,8 +35,10 @@ func useHammer(h Hammer, out chan HammerResponse, wg *sync.WaitGroup) {
 
 // HTTPHammer built-in for http requests
 type HTTPHammer struct {
-	Endpoint string
-	Method   string
+	Endpoint    string
+	Method      string
+	ContentType string
+	Body        []byte
 }
 
 var client *http.Client
@@ -49,7 +52,7 @@ func (h HTTPHammer) Hit() HammerResponse {
 
 	// Trigger HTTP request and time it
 	start := time.Now()
-	res, err := client.Get(h.Endpoint)
+	res, err := httpRequest(h)
 	end := time.Now()
 	diff := end.Sub(start)
 
@@ -71,4 +74,18 @@ func (h HTTPHammer) Hit() HammerResponse {
 		Status:    res.StatusCode,
 		Timestamp: start.UTC(),
 	}
+}
+
+func httpRequest(h HTTPHammer) (*http.Response, error) {
+	body := bytes.NewBuffer(h.Body)
+	req, err := http.NewRequest(h.Method, h.Endpoint, body)
+	if err != nil {
+		panic("Invalid HTTP request")
+	}
+
+	if len(h.ContentType) > 0 {
+		req.Header.Add("Content-Type", h.ContentType)
+	}
+
+	return client.Do(req)
 }

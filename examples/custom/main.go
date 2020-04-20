@@ -6,9 +6,9 @@ import (
 	gohammer "github.com/ferdingler/go-hammer"
 )
 
-type hammer struct{}
+type myCustomHammer struct{}
 
-func (h hammer) Hit() gohammer.HammerResponse {
+func (h myCustomHammer) Hit() gohammer.HammerResponse {
 	fmt.Println("Hitting with my custom hammer")
 	return gohammer.HammerResponse{
 		Latency: 1,
@@ -17,4 +17,11 @@ func (h hammer) Hit() gohammer.HammerResponse {
 
 func main() {
 
+	config := gohammer.RunConfig{
+		TPS:      1,
+		Duration: 10,
+	}
+
+	hammer := myCustomHammer{}
+	gohammer.Run(config, hammer)
 }
